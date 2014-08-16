@@ -17,3 +17,5 @@ if __name__ == "__main__":
     filename = sys.argv[1]
     data = analyze.read_consumption_csv(filename)
     analyze.print_summary(data)
+    print("\n")
+    analyze.print_aggregates(data)

@@ -1,9 +1,9 @@
 import pandas as pd
-# import numpy as np
+import numpy as np
 
-FILE = '../test/tageswerte-20140816-174538.csv'
-# SEP_LINE = "=================================="
 SEP_LINE = '='*33
+
+pd.set_option('display.precision', 4)
 
 
 def read_consumption_csv(filename):
@@ -41,3 +41,29 @@ def print_summary(data):
     print pd.DataFrame(extrema,
                        columns=['date', 'consumption [kWh]'],
                        index=['min', 'max'])
+
+
+def print_aggregates(data):
+    weekdays = ['Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday']
+    data['weekday'] = data.index.weekday
+    data['month'] = data.index.month
+    weekday_group = data.groupby('weekday')
+    weekday_avg = weekday_group.aggregate(np.mean)
+    weekday_avg.index = weekdays
+    weekday_avg.index.name = 'Weekday'
+
+    month_group = data.groupby('month')
+
+    print "Weekly Averages:"
+    print weekday_avg[['consumption']]
+    print "\nAverage: {}".format(weekday_avg.sum()[:-1].consumption.mean())
+    print SEP_LINE
+    print month_group[['consumption']].sum().to_string()
+    print "Average: {}".format(month_group[['consumption']].sum()[:-1].consumption.mean())
+    print month_group[['consumption']].mean()
