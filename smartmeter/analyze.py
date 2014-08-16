@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import pandas as pd
 # import numpy as np
 
@@ -9,7 +7,7 @@ SEP_LINE = '='*33
 
 
 def read_consumption_csv(filename):
-    consumptions = pd.read_csv(FILE,
+    consumptions = pd.read_csv(filename,
                                delimiter=';',
                                header=0,  # ignore header
                                usecols=[0, 1],  # third column is empty
@@ -43,8 +41,3 @@ def print_summary(data):
     print pd.DataFrame(extrema,
                        columns=['date', 'consumption [kWh]'],
                        index=['min', 'max'])
-
-
-if __name__ == "__main__":
-    data = read_consumption_csv(FILE)
-    print_summary(data)
