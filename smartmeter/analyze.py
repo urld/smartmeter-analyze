@@ -7,43 +7,46 @@ pd.set_option('display.precision', 4)
 
 
 def read_consumption_csv(filename):
-    consumptions = pd.read_csv(filename,
-                               delimiter=';',
-                               header=0,  # ignore header
-                               usecols=[0, 1],  # third column is empty
-                               names=['date', 'consumption'],
-                               index_col='date',  # use date as index
-                               decimal=',',
-                               parse_dates=True,
-                               infer_datetime_format=True,
-                               dayfirst=True,  # csv dateformat: DD.MM.YYYY
-                               )
-    return consumptions
+    usages = pd.read_csv(filename,
+                         delimiter=';',
+                         header=0,  # ignore header
+                         usecols=[0, 1],  # third column is empty
+                         names=['date', 'usage'],
+                         index_col='date',  # use date as index
+                         decimal=',',
+                         parse_dates=True,
+                         infer_datetime_format=True,
+                         dayfirst=True,  # csv dateformat: DD.MM.YYYY
+                         )
+    return usages
 
 
 def print_summary(data):
-    aggregates = [[data.consumption.sum()],
-                  [data.consumption.mean()],
+    data['month'] = data.index.month
+    month_group = data.groupby('month')
+    aggregates = [[data.usage.sum()],
+                  [month_group[['usage']].sum()[:-1].usage.mean()],
+                  [data.usage.mean()],
                   ]
-    extrema = [[data.consumption.idxmin(), data.consumption.min()],
-               [data.consumption.idxmax(), data.consumption.max()],
+    extrema = [[data.usage.idxmin(), data.usage.min()],
+               [data.usage.idxmax(), data.usage.max()],
                ]
     print "CONSUMPTION SUMMARIES"
     print SEP_LINE
     print "from {}".format(data.index.min().date())
     print "to   {}".format(data.index.max().date())
-    print "({} days)".format(data.consumption.count())
+    print "({} days)".format(data.usage.count())
     print SEP_LINE
     print pd.DataFrame(aggregates,
-                       columns=['consumption [kWh]'],
-                       index=['sum', 'average'])
+                       columns=['usage [kWh]'],
+                       index=['sum', 'monthly average', 'daily average'])
     print SEP_LINE
     print pd.DataFrame(extrema,
-                       columns=['date', 'consumption [kWh]'],
+                       columns=['date', 'usage [kWh]'],
                        index=['min', 'max'])
 
 
-def print_aggregates(data):
+def print_stats_week(data):
     weekdays = ['Monday',
                 'Tuesday',
                 'Wednesday',
@@ -52,18 +55,13 @@ def print_aggregates(data):
                 'Saturday',
                 'Sunday']
     data['weekday'] = data.index.weekday
-    data['month'] = data.index.month
     weekday_group = data.groupby('weekday')
     weekday_avg = weekday_group.aggregate(np.mean)
     weekday_avg.index = weekdays
     weekday_avg.index.name = 'Weekday'
+    weekly_avg = weekday_avg.sum()[:-1].usage.mean()
 
-    month_group = data.groupby('month')
-
-    print "Weekly Averages:"
-    print weekday_avg[['consumption']]
-    print "\nAverage: {}".format(weekday_avg.sum()[:-1].consumption.mean())
+    print "WEEK STATS:"
     print SEP_LINE
-    print month_group[['consumption']].sum().to_string()
-    print "Average: {}".format(month_group[['consumption']].sum()[:-1].consumption.mean())
-    print month_group[['consumption']].mean()
+    print weekday_avg[['usage']]
+    print "\nweekly average {} kWh".format(round(weekly_avg, 3))

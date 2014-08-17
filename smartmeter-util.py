@@ -18,4 +18,4 @@ if __name__ == "__main__":
     data = analyze.read_consumption_csv(filename)
     analyze.print_summary(data)
     print("\n")
-    analyze.print_aggregates(data)
+    analyze.print_stats_week(data)
