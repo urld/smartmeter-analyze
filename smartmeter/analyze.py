@@ -1,5 +1,6 @@
 import os
 from fnmatch import fnmatch
+import logging
 
 import pandas as pd
 import numpy as np
@@ -7,6 +8,8 @@ import numpy as np
 SEP_LINE = '='*33
 
 pd.set_option('display.precision', 4)
+
+log = logging.getLogger(__name__)
 
 
 class InputError(Exception):
@@ -44,6 +47,7 @@ def _prepare_filelist(arg, pattern):
 
 def read_consumption_csv(filenames, pattern):
     filenames = _prepare_filelist(filenames, pattern)
+    log.debug('Reading files: ' + repr(filenames))
     if not filenames:
         raise InputError('CSV files not found.')
     usages = []
@@ -60,12 +64,22 @@ def read_consumption_csv(filenames, pattern):
                                dayfirst=True,  # csv dateformat: DD.MM.YYYY
                                )]
 
-    usage_set = pd.concat(usages)
-    usage_set.sort_index(inplace=True)
-    return usage_set.groupby(usage_set.index).first()
+    usage_union = pd.concat(usages)
+    usage_union.sort_index(inplace=True)
+    usage_unique = usage_union.groupby(usage_union.index).first()
+    log.info('read_consumption_csv: IN={} OUT={}'.format(len(usage_union),
+                                                         len(usage_unique)))
+    return usage_unique
 
 
 def print_summary(data):
+    """Print summary of the given DataFrame.
+    The summary includes the date range, nonthly and daily averages and the days
+    with the minimum and maximum usage/consumption.
+
+    Arguments:
+    data -- pandas.DataFrame containing at least a date and a usage column.
+    """
     data['month'] = data.index.month
     month_group = data.groupby('month')
     aggregates = [[data.usage.sum()],
@@ -108,4 +122,4 @@ def print_stats_week(data):
     print "WEEK STATS:"
     print SEP_LINE
     print weekday_avg[['usage']]
-    print "\nweekly average {} kWh".format(round(weekly_avg, 3))
+    print "\nweekly average:   {} kWh".format(round(weekly_avg, 3))

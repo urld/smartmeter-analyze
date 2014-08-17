@@ -17,14 +17,18 @@ Options:
 
 from __future__ import print_function
 import sys
+import logging
 
 from docopt import docopt
 from smartmeter import analyze
 
+log = logging.getLogger(__name__)
+
 if __name__ == "__main__":
     args = docopt(__doc__.format(basename=__file__), version='0.1.0')
     if args['--debug']:
-        print(args)
+        logging.getLogger().setLevel(logging.DEBUG)
+    log.debug(args)
     try:
         data = analyze.read_consumption_csv(args['<filename>'], args['-p'])
     except analyze.InputError as e:
