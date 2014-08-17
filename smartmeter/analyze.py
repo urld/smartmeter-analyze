@@ -59,7 +59,7 @@ def print_stats_week(data):
     weekday_avg = weekday_group.aggregate(np.mean)
     weekday_avg.index = weekdays
     weekday_avg.index.name = 'Weekday'
-    weekly_avg = weekday_avg.sum()[:-1].usage.mean()
+    weekly_avg = weekday_avg.sum()
 
     print "WEEK STATS:"
     print SEP_LINE
