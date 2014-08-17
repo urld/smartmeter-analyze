@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+from smartmeter import __version__
 
 # readme = open('README.rst').read()
 
 setup(
     name='smartmeter',
-    version='0.1.0',
+    version=__version__,
     description='tools to analyze and manage consumption data from smartmeters',
     # long_description=readme + '\n\n' + history,
     author='David Url',

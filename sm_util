@@ -20,12 +20,12 @@ import sys
 import logging
 
 from docopt import docopt
-from smartmeter import analyze
+from smartmeter import analyze, __version__
 
 log = logging.getLogger(__name__)
 
 if __name__ == "__main__":
-    args = docopt(__doc__.format(basename=__file__), version='0.1.0')
+    args = docopt(__doc__.format(basename=__file__), version=__version__)
     if args['--debug']:
         logging.getLogger().setLevel(logging.DEBUG)
     log.debug(args)
