@@ -19,14 +19,23 @@ setup(
         'docopt',
     ],
     scripts=[
-        'smartmeter-util.py',
+        'smutil',
     ],
     package_dir={'smartmeter': 'smartmeter'},
     license="BSD",
     keywords='smartmeter, data analysis',
     classifiers=[
+        'Development Status :: 1 - Planning',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Natural Language :: English',
+        'Operating System :: OS Independent',   # is it?
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Utilities',
+        '',
     ],
 )
