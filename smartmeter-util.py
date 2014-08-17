@@ -2,9 +2,9 @@
 """Smartmeter Util.
 
 Usage:
-    {basename} [options] <filename>
-    {basename} weekly [options] <filename>
-    {basename} import [options] <filename>
+    {basename} summary [options] <filename>...
+    {basename} weekly [options] <filename>...
+    {basename} import [options] <filename>...
     {basename} -h | --help
     {basename} --version
 
@@ -20,9 +20,9 @@ from smartmeter import analyze
 
 if __name__ == "__main__":
     arguments = docopt(__doc__.format(basename=__file__), version='0.1.0')
+    data = analyze.read_consumption_csv(arguments['<filename>'])
     if arguments['--debug']:
         print(arguments)
-    data = analyze.read_consumption_csv(arguments['<filename>'])
     if arguments['weekly']:
         analyze.print_stats_week(data)
     else:

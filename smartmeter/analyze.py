@@ -6,19 +6,26 @@ SEP_LINE = '='*33
 pd.set_option('display.precision', 4)
 
 
-def read_consumption_csv(filename):
-    usages = pd.read_csv(filename,
-                         delimiter=';',
-                         header=0,  # ignore header
-                         usecols=[0, 1],  # third column is empty
-                         names=['date', 'usage'],
-                         index_col='date',  # use date as index
-                         decimal=',',
-                         parse_dates=True,
-                         infer_datetime_format=True,
-                         dayfirst=True,  # csv dateformat: DD.MM.YYYY
-                         )
-    return usages
+def read_consumption_csv(filenames):
+    if isinstance(filenames, str):
+        filenames = [filenames]
+    usages = []
+    for filename in filenames:
+        usages += [pd.read_csv(filename,
+                               delimiter=';',
+                               header=0,  # ignore header
+                               usecols=[0, 1],  # third column is empty
+                               names=['date', 'usage'],
+                               index_col='date',  # use date as index
+                               decimal=',',
+                               parse_dates=True,
+                               infer_datetime_format=True,
+                               dayfirst=True,  # csv dateformat: DD.MM.YYYY
+                               )]
+
+    usage_set = pd.concat(usages)
+    usage_set.sort_index(inplace=True)
+    return usage_set.groupby(usage_set.index).first()
 
 
 def print_summary(data):
