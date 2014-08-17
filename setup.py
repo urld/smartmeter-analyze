@@ -15,8 +15,11 @@ setup(
     packages=[
         'smartmeter',
     ],
+    py_modules=[
+        'docopt',
+    ],
     scripts=[
-        'smartmeter-util',
+        'smartmeter-util.py',
     ],
     package_dir={'smartmeter': 'smartmeter'},
     license="BSD",
