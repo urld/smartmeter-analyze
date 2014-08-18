@@ -16,6 +16,7 @@ setup(
     packages=[
         'smartmeter',
     ],
+    package_data={'smartmeter': ['logging.conf']},
     py_modules=[
         'docopt',
     ],
