@@ -1,5 +1,7 @@
 include AUTHORS.rst
+include README.rst
 include LICENSE
+recursive-include smartmeter *.conf
 
 recursive-exclude tests *
 recursive-exclude * __pycache__
