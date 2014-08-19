@@ -62,6 +62,9 @@ setup(
     scripts=[
         'smutil',
     ],
+    requires=[
+        'pandas (>=0.14.1)',
+    ],
     license='GNU Affero General Public License v3 or later (AGPLv3+)',
     keywords='smartmeter, data analysis',
     classifiers=[
