@@ -29,6 +29,8 @@ Credits
 
 Icon
 ----
+
 The Icon was composed by the following pictograms:
+
 * Graph designed by Pham Thi Dieu Linh from the thenounproject.com
 * Socket designed by hunotika from the thenounproject.com
