@@ -23,3 +23,12 @@ TODO
 * integration of pricing (energy only)
 
 * release version 0.1.0
+
+Credits
+=======
+
+Icon
+----
+The Icon was composed by the following pictograms:
+* Graph designed by Pham Thi Dieu Linh from the thenounproject.com
+* Socket designed by hunotika from the thenounproject.com
