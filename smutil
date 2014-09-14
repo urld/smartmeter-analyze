@@ -4,6 +4,7 @@
 Usage:
     {basename} summary [options] [-p <pattern>] <filename>...
     {basename} weekly [options] [-p <pattern>] <filename>...
+    {basename} compare [options] [-p <pattern>] <filename>...
     {basename} import [options] [-p <pattern>] <filename>...
     {basename} -h | --help
     {basename} --version
@@ -36,5 +37,8 @@ if __name__ == "__main__":
         sys.exit(1)
     if args['weekly']:
         analyze.print_stats_week(data)
+    elif args['compare']:
+        analyze.print_comparisons(data)
     else:
+        # default to 'summary'
         analyze.print_summary(data)

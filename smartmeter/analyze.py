@@ -1,9 +1,10 @@
-import os
+import datetime
 from fnmatch import fnmatch
 import logging
+import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 SEP_LINE = '='*33
 
@@ -123,3 +124,37 @@ def print_stats_week(data):
     print SEP_LINE
     print weekday_avg[['usage']]
     print "\nweekly average:   {} kWh".format(round(weekly_avg, 3))
+
+
+def print_comparisons(data, due_date=None):
+    # build cumulative sums:
+    data['month'] = data.index.month
+    group = data.groupby('month')
+    data['cumulative_usage'] = group['usage'].cumsum()
+    # compare with previous cumulative sum of previous group (month/year):
+    if due_date is None:
+        due_date = data.index.max().date()
+    current_usage = data.loc[due_date, 'cumulative_usage']
+    previous_date = _previous_month(due_date)
+    previous_usage = data.loc[previous_date, 'cumulative_usage']
+    previous_end_date = _previous_month_end(due_date)
+    previous_monthly_usage = data.loc[previous_end_date, 'cumulative_usage']
+    cumulative_delta = current_usage - previous_usage
+    print "MONTHLY COMPARISONS:"
+    print SEP_LINE
+    print "Last month:    {} kWh\t({})".format(previous_monthly_usage,
+                                               previous_end_date)
+    print "Current month: {} kWh\t({})".format(current_usage, due_date)
+    print "Difference:    {0:+} kWh\t({1})".format(cumulative_delta,
+                                                   previous_date)
+
+
+def _previous_month(date):
+    prev_month = date
+    while prev_month.month == date.month or date.day < prev_month.day:
+        prev_month -= datetime.timedelta(days=1)
+    return prev_month
+
+
+def _previous_month_end(date):
+    return date.replace(day=1) - datetime.timedelta(days=1)
