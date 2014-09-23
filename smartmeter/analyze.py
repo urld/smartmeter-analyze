@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 class InputError(Exception):
-
+    """Raised if there was a problem with input files."""
     def __init__(self, msg, input=None):
         self.msg = msg
         self.input = input
@@ -26,28 +26,65 @@ class InputError(Exception):
             return str(self.msg)
 
 
-def _get_filelist_from_dir(dir, pattern):
-    filelist = []
-    for root, dirs, files in os.walk(dir, followlinks=True):
-        filelist += [os.path.join(root, f)
-                     for f in files if fnmatch(f, pattern)]
-    return filelist
+class FileDataSource(object):
+    """A collection of csv files which are used as data source."""
 
+    def __init__(self, sources=[], pattern='*.csv'):
+        self.sources = []
+        self.raw_sources = {}
+        self.cached_data = None
+        for source in sources:
+            self.add_source_directory(source, pattern)
 
-def _prepare_filelist(arg, pattern):
-    filenames = []
-    for path in arg:
-        if os.path.isdir(path):
-            filenames += _get_filelist_from_dir(path, pattern)
-        elif os.path.isfile(path):
-            filenames += [path]
+    def add_source_file(self, file):
+        if not os.path.isfile(file):
+            raise InputError('CSV file not found', input=file)
+        self.raw_sources[file] = None
+        self.sources += [file]
+        return file
+
+    def add_source_directory(self, directory, pattern):
+        if os.path.isdir(directory):
+            self.raw_sources[directory] = pattern
+            sources = self._find_files(directory, pattern)
+            self.sources += sources
+            return sources
         else:
-            raise InputError('CSV files not found', input=path)
-    return filenames
+            return self.add_source_file(directory)
+
+    def _find_files(self, directory, pattern):
+        filelist = []
+        for root, dirs, files in os.walk(directory, followlinks=True):
+            filelist += [os.path.join(root, f)
+                         for f in files if fnmatch(f, pattern)]
+        return filelist
+
+    def refresh_sources(self):
+        sources = []
+        for dir, pattern in self.raw_sources:
+            if pattern:
+                sources += self._find_files(dir, pattern)
+            else:
+                sources += [dir]
+        log.info("{} files found. (previously: {})".format(len(sources),
+                                                           len(self.sources)))
+        self.sources = sources
+
+    def read_data(self):
+        self.cached_data = _read_consumption_csv(self.sources)
+        return self.cached_data
+
+    def get_data(self):
+        if self.cached_data:
+            return self.cached_data
+        else:
+            return self.read_data()
+
+    def drop_cache(self):
+        self.cached_data = None
 
 
-def read_consumption_csv(filenames, pattern):
-    filenames = _prepare_filelist(filenames, pattern)
+def _read_consumption_csv(filenames):
     log.debug('Reading files: ' + repr(filenames))
     if not filenames:
         raise InputError('CSV files not found.')

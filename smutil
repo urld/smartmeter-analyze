@@ -31,7 +31,8 @@ if __name__ == "__main__":
         logging.getLogger().setLevel(logging.DEBUG)
     log.debug(args)
     try:
-        data = analyze.read_consumption_csv(args['<filename>'], args['-p'])
+        input = analyze.FileDataSource(args['<filename>'], args['-p'])
+        data = input.get_data()
     except analyze.InputError as e:
         print(e)
         sys.exit(1)
