@@ -3,7 +3,6 @@
 
 Usage:
     {basename} summary [options] [-p <pattern>] <filename>...
-    {basename} weekly [options] [-p <pattern>] <filename>...
     {basename} compare [options] [-p <pattern>] <filename>...
     {basename} import [options] [-p <pattern>] <filename>...
     {basename} -h | --help
@@ -14,6 +13,11 @@ Options:
     --debug         Print debugging messages.
     -p <pattern>    Pattern to filter csv files if one or more directories are
                     specified in the file list. [default: tageswerte*.csv]
+
+Commands:
+    summary         Print a statistical summary of all usage data.
+    compare         Inspect and compare latest usage data to previous power
+                    consumption.
 """
 
 from __future__ import print_function
@@ -26,20 +30,28 @@ from smartmeter import analyze, __version__
 log = logging.getLogger(__name__)
 
 if __name__ == "__main__":
+    # parse commandline options:
     args = docopt(__doc__.format(basename=__file__), version=__version__)
     if args['--debug']:
         logging.getLogger().setLevel(logging.DEBUG)
     log.debug(args)
+
+    # parse input sources:
     try:
         input = analyze.FileDataSource(args['<filename>'], args['-p'])
-        data = input.get_data()
     except analyze.InputError as e:
         print(e)
         sys.exit(1)
-    if args['weekly']:
-        analyze.print_stats_week(data)
-    elif args['compare']:
-        analyze.print_comparisons(data)
+
+    # execute command:
+    if args['compare']:
+        stats = analyze.Stats(input.get_data())
+        stats.calc_stats()
+        analyze.print_comparisons(stats)
+    elif args['import']:
+        print('not implemented')
+        sys.exit(1)
     else:
-        # default to 'summary'
-        analyze.print_summary(data)
+        stats = analyze.Stats(input.get_data())
+        stats.calc_stats()
+        analyze.print_summary(stats)

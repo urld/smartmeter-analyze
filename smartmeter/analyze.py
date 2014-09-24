@@ -14,7 +14,9 @@ log = logging.getLogger(__name__)
 
 
 class InputError(Exception):
+
     """Raised if there was a problem with input files."""
+
     def __init__(self, msg, input=None):
         self.msg = msg
         self.input = input
@@ -27,6 +29,7 @@ class InputError(Exception):
 
 
 class FileDataSource(object):
+
     """A collection of csv files which are used as data source."""
 
     def __init__(self, sources=[], pattern='*.csv'):
@@ -69,121 +72,171 @@ class FileDataSource(object):
         log.info("{} files found. (previously: {})".format(len(sources),
                                                            len(self.sources)))
         self.sources = sources
-
-    def read_data(self):
-        self.cached_data = _read_consumption_csv(self.sources)
-        return self.cached_data
-
-    def get_data(self):
-        if self.cached_data:
-            return self.cached_data
-        else:
-            return self.read_data()
-
-    def drop_cache(self):
         self.cached_data = None
 
+    def _read_data(self):
+        log.debug('Reading files: ' + repr(self.sources))
+        data = []
+        for filename in self.sources:
+            data += [pd.read_csv(filename,
+                                 delimiter=';',
+                                 header=0,  # ignore header
+                                 usecols=[0, 1],  # third column is empty
+                                 names=['date', 'usage'],
+                                 index_col='date',  # use date as index
+                                 decimal=',',
+                                 parse_dates=True,
+                                 infer_datetime_format=True,
+                                 dayfirst=True,  # csv dateformat: DD.MM.YYYY
+                                 )]
+        if data:
+            union = pd.concat(data)
+            union.sort_index(inplace=True)
+            unique = union.groupby(union.index).first()
+            log.info('read_data: IN={} OUT={}'.format(len(union), len(unique)))
+            return unique
+        else:
+            raise InputError('No data read.')
 
-def _read_consumption_csv(filenames):
-    log.debug('Reading files: ' + repr(filenames))
-    if not filenames:
-        raise InputError('CSV files not found.')
-    usages = []
-    for filename in filenames:
-        usages += [pd.read_csv(filename,
-                               delimiter=';',
-                               header=0,  # ignore header
-                               usecols=[0, 1],  # third column is empty
-                               names=['date', 'usage'],
-                               index_col='date',  # use date as index
-                               decimal=',',
-                               parse_dates=True,
-                               infer_datetime_format=True,
-                               dayfirst=True,  # csv dateformat: DD.MM.YYYY
-                               )]
-
-    usage_union = pd.concat(usages)
-    usage_union.sort_index(inplace=True)
-    usage_unique = usage_union.groupby(usage_union.index).first()
-    log.info('read_consumption_csv: IN={} OUT={}'.format(len(usage_union),
-                                                         len(usage_unique)))
-    return usage_unique
-
-
-def print_summary(data):
-    """Print summary of the given DataFrame.
-    The summary includes the date range, nonthly and daily averages and the days
-    with the minimum and maximum usage/consumption.
-
-    Arguments:
-    data -- pandas.DataFrame containing at least a date and a usage column.
-    """
-    data['month'] = data.index.month
-    month_group = data.groupby('month')
-    aggregates = [[data.usage.sum()],
-                  [month_group[['usage']].sum()[:-1].usage.mean()],
-                  [data.usage.mean()],
-                  ]
-    extrema = [[data.usage.idxmin(), data.usage.min()],
-               [data.usage.idxmax(), data.usage.max()],
-               ]
-    print "CONSUMPTION SUMMARIES"
-    print SEP_LINE
-    print "from {}".format(data.index.min().date())
-    print "to   {}".format(data.index.max().date())
-    print "({} days)".format(data.usage.count())
-    print SEP_LINE
-    print pd.DataFrame(aggregates,
-                       columns=['usage [kWh]'],
-                       index=['sum', 'monthly average', 'daily average'])
-    print SEP_LINE
-    print pd.DataFrame(extrema,
-                       columns=['date', 'usage [kWh]'],
-                       index=['min', 'max'])
+    def get_data(self):
+        if self.cached_data is None:
+            self.cached_data = self._read_data()
+        return self.cached_data
 
 
-def print_stats_week(data):
-    weekdays = ['Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday',
-                'Sunday']
-    data['weekday'] = data.index.weekday
-    weekday_group = data.groupby('weekday')
-    weekday_avg = weekday_group.aggregate(np.mean)
-    weekday_avg.index = weekdays
-    weekday_avg.index.name = 'Weekday'
-    weekly_avg = weekday_avg.sum()
+class Stats(object):
 
-    print "WEEK STATS:"
-    print SEP_LINE
-    print weekday_avg[['usage']]
-    print "\nweekly average:   {} kWh".format(round(weekly_avg, 3))
+    def __init__(self, data):
+        self.data = data
+        self._extend_dataframe()
+        self.start_date = None
+        self.end_date = None
+        self.day_count = None
+        self.averages = {}
+        self.max = None
+        self.max_date = None
+        self.min = None
+        self.min_date = None
+
+    def _extend_dataframe(self):
+        self.data['year'] = self.data.index.year
+        self.data['month'] = self.data.index.month
+        self.data['weekday'] = self.data.index.weekday
+        monthly = self.data.groupby('month')
+        self.data['monthly_cumsum'] = monthly['usage'].cumsum()
+        yearly = self.data.groupby('year')
+        self.data['yearly_cumsum'] = yearly['usage'].cumsum()
+
+    def calc_date_range(self):
+        if not self.start_date:
+            self.start_date = self.data.index.min().date()
+        if not self.end_date:
+            self.end_date = self.data.index.max().date()
+        if not self.day_count:
+            self.day_count = self.data.usage.count()
+        return self.start_date, self.end_date
+
+    def calc_averages(self):
+        weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                    'Saturday', 'Sunday']
+        if 'daily' not in self.averages:
+            self.averages['daily'] = self.data.usage.mean()
+        if 'monthly' not in self.averages:
+            monthly = self.data.groupby('month')
+            monthly_avg = monthly[['usage']].sum()[:-1].usage.mean()
+            self.averages['monthly'] = monthly_avg
+        if 'weekly' not in self.averages:
+            weekday_group = self.data.groupby('weekday')
+            weekday_avg = weekday_group.aggregate(np.mean)
+            weekday_avg.index = weekdays
+            for weekday in weekdays:
+                self.averages[weekday] = weekday_avg.loc[weekday, 'usage']
+            self.averages['weekly'] = weekday_avg.sum()['usage']
+        return self.averages
+
+    def calc_extrema(self):
+        if not self.min:
+            self.min_date = self.data.usage.idxmin().date()
+            self.min = self.data.usage.min()
+        if not self.max:
+            self.max_date = self.data.usage.idxmax().date()
+            self.max = self.data.usage.max()
+        return self.min, self.max
+
+    def calc_stats(self):
+        self.calc_date_range()
+        self.calc_extrema()
+        self.calc_averages()
+
+    def get_monthly_cumsum(self, due_date=None):
+        if not due_date:
+            due_date = self.end_date
+        return self.data.loc[due_date, 'monthly_cumsum']
+
+    def get_yearly_cumsum(self, due_date=None):
+        if not due_date:
+            due_date = self.end_date
+        return self.data.loc[due_date, 'yearly_cumsum']
 
 
-def print_comparisons(data, due_date=None):
-    # build cumulative sums:
-    data['month'] = data.index.month
-    group = data.groupby('month')
-    data['cumulative_usage'] = group['usage'].cumsum()
-    # compare with previous cumulative sum of previous group (month/year):
-    if due_date is None:
-        due_date = data.index.max().date()
-    current_usage = data.loc[due_date, 'cumulative_usage']
-    previous_date = _previous_month(due_date)
-    previous_usage = data.loc[previous_date, 'cumulative_usage']
-    previous_end_date = _previous_month_end(due_date)
-    previous_monthly_usage = data.loc[previous_end_date, 'cumulative_usage']
-    cumulative_delta = current_usage - previous_usage
-    print "MONTHLY COMPARISONS:"
-    print SEP_LINE
-    print "Last month:    {} kWh\t({})".format(previous_monthly_usage,
-                                               previous_end_date)
-    print "Current month: {} kWh\t({})".format(current_usage, due_date)
-    print "Difference:    {0:+} kWh\t({1})".format(cumulative_delta,
-                                                   previous_date)
+def print_summary(stats):
+    print_coverage(stats)
+    print_extrema(stats)
+    print_averages(stats)
+
+
+def print_coverage(stats):
+    print "============="
+    print "DATA COVERAGE"
+    print "=============\n"
+    print "     {} days".format(stats.day_count)
+    print "from {}".format(stats.start_date)
+    print "to   {}".format(stats.end_date)
+    print ""
+
+
+def print_extrema(stats):
+    print "======="
+    print "EXTREMA"
+    print "=======\n"
+    print " min usage {:>8} kWh  ({})".format(stats.min, stats.min_date)
+    print " max usage {:>8} kWh  ({})".format(stats.max, stats.max_date)
+    print ""
+
+
+def print_averages(stats):
+    print "========"
+    print "AVERAGES"
+    print "========\n"
+    for key in ['monthly', 'weekly', 'daily']:
+        print "{:>10}{:>9.3f} kWh".format(key, round(stats.averages[key], 3))
+    print ""
+    weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                'Saturday', 'Sunday']
+    for key in weekdays:
+        print "{:>10}{:>9.3f} kWh".format(key, round(stats.averages[key], 3))
+    print ""
+
+
+def print_comparisons(stats, due_date=None):
+    if not due_date:
+        due_date = stats.end_date
+    cum_usage = stats.get_monthly_cumsum(due_date)
+    prev_due_date = _previous_month(due_date)
+    prev_cum_usage = stats.get_monthly_cumsum(prev_due_date)
+    prev_end_date = _previous_month_end(due_date)
+    prev_total_usage = stats.get_monthly_cumsum(prev_end_date)
+    delta = cum_usage - prev_cum_usage
+    print "==================="
+    print "MONTHLY COMPARISONS"
+    print "===================\n"
+    print "last month total {:>9.3f} kWh  ({})".format(prev_total_usage,
+                                                       prev_end_date)
+    print "last month       {:>9.3f} kWh  ({})".format(prev_cum_usage,
+                                                       prev_due_date)
+    print "current month    {:>9.3f} kWh  ({})".format(cum_usage, due_date)
+    print "difference       {:>+9.3f} kWh  ({})".format(delta, prev_due_date)
+    print ""
 
 
 def _previous_month(date):
