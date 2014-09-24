@@ -227,6 +227,9 @@ def print_comparisons(stats, due_date=None):
     prev_end_date = _previous_month_end(due_date)
     prev_total_usage = stats.get_monthly_cumsum(prev_end_date)
     delta = cum_usage - prev_cum_usage
+    predicted_usage = (cum_usage/due_date.day) * 30.5
+    predicted_delta = predicted_usage - prev_total_usage
+    predicted_avg_delta = predicted_usage - stats.averages['monthly']
     print "==================="
     print "MONTHLY COMPARISONS"
     print "===================\n"
@@ -236,6 +239,15 @@ def print_comparisons(stats, due_date=None):
                                                        prev_due_date)
     print "current month    {:>9.3f} kWh  ({})".format(cum_usage, due_date)
     print "difference       {:>+9.3f} kWh  ({})".format(delta, prev_due_date)
+    print ""
+    print "================"
+    print "USAGE PREDICTION"
+    print "================\n"
+    print "expected usage   {:>9.3f} kWh  ({})".format(predicted_usage,
+                                                       _month_end(due_date))
+    print "difference       {:>+9.3f} kWh  ({})".format(predicted_delta,
+                                                        prev_end_date)
+    print "difference       {:>+9.3f} kWh  (avg)".format(predicted_avg_delta)
     print ""
 
 
@@ -248,3 +260,7 @@ def _previous_month(date):
 
 def _previous_month_end(date):
     return date.replace(day=1) - datetime.timedelta(days=1)
+
+
+def _month_end(date):
+    return _previous_month_end(date.replace(day=1).replace(month=date.month+1))
