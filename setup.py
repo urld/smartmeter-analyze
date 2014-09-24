@@ -46,13 +46,13 @@ class install_complete(install):
 
 setup(
     cmdclass={'install': install_complete},
-    name='smartmeter',
+    name='smartmeter-analyze',
     version=__version__,
     description='tools to analyze and manage consumption data from smartmeters',
     long_description=readme,
     author='David Url',
     author_email='david@x00.at',
-    url='https://x00.at',
+    url='https://github.com/durl/smartmeter-analyze',
     packages=[
         'smartmeter',
     ],
