@@ -4,7 +4,6 @@
 Usage:
     {basename} summary [options] [-p <pattern>] <filename>...
     {basename} compare [options] [-p <pattern>] <filename>...
-    {basename} import [options] [-p <pattern>] <filename>...
     {basename} -h | --help
     {basename} --version
 
@@ -48,10 +47,7 @@ if __name__ == "__main__":
         stats = analyze.Stats(input.get_data())
         stats.calc_stats()
         analyze.print_comparisons(stats)
-    elif args['import']:
-        print('not implemented')
-        sys.exit(1)
-    else:
+    elif args['summary']:
         stats = analyze.Stats(input.get_data())
         stats.calc_stats()
         analyze.print_summary(stats)

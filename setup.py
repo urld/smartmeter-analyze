@@ -5,10 +5,12 @@ from distutils.core import setup
 from distutils.command.install import install
 from smartmeter import __version__
 
-# readme = open('README.rst').read()
+with open('README.rst') as readme:
+    readme = readme.read() # reading the readme (haha)
 
 
 def _merge_dicts(d1, d2):
+    """this is a pretty pointless hack (see install_complete)"""
     d = d1
     for k2 in d2:
         if k2 in d1:
@@ -47,7 +49,7 @@ setup(
     name='smartmeter',
     version=__version__,
     description='tools to analyze and manage consumption data from smartmeters',
-    # long_description=readme + '\n\n' + history,
+    long_description=readme,
     author='David Url',
     author_email='david@x00.at',
     url='https://x00.at',
@@ -68,7 +70,8 @@ setup(
     license='GNU Affero General Public License v3 or later (AGPLv3+)',
     keywords='smartmeter, data analysis',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        # 'Development Status :: 1 - Planning',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',

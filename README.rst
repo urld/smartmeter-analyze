@@ -11,18 +11,16 @@ Features
 ========
 
 * Generation of basic consumption summaries (averages, peaks, etc.)
+* Basic consumption prediction
 * Handling of one or many (not necessarily disjunct) datasets
 
 TODO
 ====
 
 * More sophisticated summaries
-* Basic forecasts
 * import/storage of data
 * Report generation
 * integration of pricing (energy only)
-
-* release version 0.1.0
 
 Credits
 =======

@@ -6,10 +6,6 @@ import os
 import numpy as np
 import pandas as pd
 
-SEP_LINE = '='*33
-
-pd.set_option('display.precision', 4)
-
 log = logging.getLogger(__name__)
 
 
