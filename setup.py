@@ -6,11 +6,6 @@ from smartmeter import __version__
 with open('README.rst') as readme:
     readme = readme.read()  # reading the readme (haha)
 
-
-EXTERNAL_PACKAGE_DATA = {'smartmeter': ['LICENSE', 'README.rst', 'AUTHORS.rst']}
-PACKAGE_DATA = {'smartmeter': ['logging.conf']}
-
-
 setup(
     name='smartmeter-analyze',
     version=__version__,
@@ -23,7 +18,7 @@ setup(
         'smartmeter',
     ],
     package_dir={'smartmeter': 'smartmeter'},
-    package_data=PACKAGE_DATA,
+    package_data={'smartmeter': ['logging.conf']},
     py_modules=[
         'docopt',
     ],
@@ -34,7 +29,7 @@ setup(
         'pandas (>=0.14.1)',
     ],
     license='GNU Affero General Public License v3 or later (AGPLv3+)',
-    keywords='smartmeter, data analysis',
+    keywords='smartmeter, data analysis, wiener netze',
     classifiers=[
         # 'Development Status :: 1 - Planning',
         'Development Status :: 4 - Beta',
