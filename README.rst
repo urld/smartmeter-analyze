@@ -7,6 +7,26 @@ This Tool was written to analyze your personal energy consumption.
 The Tool currently only supports CSV files with daily consumption values, as
 provided by the 'Smart Metering' service of 'Wiener Netze GmbH'.
 
+Installation
+============
+
+::
+
+    $ pip install smartmeter-analyze
+
+Usage
+=====
+
+Print a statistical summary of your energy consumption::
+
+    $ smutil summary consumption-file.csv
+
+Print the summary, using multiple files or directories::
+
+    $ smutil summary ~/some_dir_with_consumption_files/ another-file.csv
+
+You can download your energy consumption data from smartmetering.wienernetze.at
+
 Features
 ========
 

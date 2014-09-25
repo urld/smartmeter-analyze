@@ -182,7 +182,6 @@ def print_summary(stats):
 
 
 def print_coverage(stats):
-    print "============="
     print "DATA COVERAGE"
     print "=============\n"
     print "     {} days".format(stats.day_count)
@@ -192,7 +191,6 @@ def print_coverage(stats):
 
 
 def print_extrema(stats):
-    print "======="
     print "EXTREMA"
     print "=======\n"
     print " min usage {:>8} kWh  ({})".format(stats.min, stats.min_date)
@@ -201,7 +199,6 @@ def print_extrema(stats):
 
 
 def print_averages(stats):
-    print "========"
     print "AVERAGES"
     print "========\n"
     for key in ['monthly', 'weekly', 'daily']:
@@ -226,7 +223,6 @@ def print_comparisons(stats, due_date=None):
     predicted_usage = (cum_usage/due_date.day) * 30.5
     predicted_delta = predicted_usage - prev_total_usage
     predicted_avg_delta = predicted_usage - stats.averages['monthly']
-    print "==================="
     print "MONTHLY COMPARISONS"
     print "===================\n"
     print "last month total {:>9.3f} kWh  ({})".format(prev_total_usage,
@@ -236,7 +232,6 @@ def print_comparisons(stats, due_date=None):
     print "current month    {:>9.3f} kWh  ({})".format(cum_usage, due_date)
     print "difference       {:>+9.3f} kWh  ({})".format(delta, prev_due_date)
     print ""
-    print "================"
     print "USAGE PREDICTION"
     print "================\n"
     print "expected usage   {:>9.3f} kWh  ({})".format(predicted_usage,
