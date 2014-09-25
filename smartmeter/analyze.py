@@ -181,6 +181,16 @@ def print_summary(stats):
     print_averages(stats)
 
 
+def rst_summary(stats):
+    rst = []
+    rst.append("DATA COVERAGE")
+    rst.append("=============\n\n::\n")
+    rst.append(" {} days".format(stats.day_count))
+    rst.append(" from {}".format(stats.start_date))
+    rst.append(" to   {}".format(stats.end_date))
+    return '\n'.join(rst)
+
+
 def print_coverage(stats):
     print "DATA COVERAGE"
     print "=============\n"
