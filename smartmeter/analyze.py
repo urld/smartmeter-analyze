@@ -74,17 +74,7 @@ class FileDataSource(object):
         log.debug('Reading files: ' + repr(self.sources))
         data = []
         for filename in self.sources:
-            data += [pd.read_csv(filename,
-                                 delimiter=';',
-                                 header=0,  # ignore header
-                                 usecols=[0, 1],  # third column is empty
-                                 names=['date', 'usage'],
-                                 index_col='date',  # use date as index
-                                 decimal=',',
-                                 parse_dates=True,
-                                 infer_datetime_format=True,
-                                 dayfirst=True,  # csv dateformat: DD.MM.YYYY
-                                 )]
+            data += [read_csv_file(filename)]
         if data:
             union = pd.concat(data)
             union.sort_index(inplace=True)
@@ -112,7 +102,6 @@ def read_csv_file(file):
                        infer_datetime_format=True,
                        dayfirst=True,  # csv dateformat: DD.MM.YYYY
                        )
-    log.info('read_data: IN={} OUT={}'.format(len(data), len(data)))
     return data
 
 
@@ -129,7 +118,6 @@ class Stats(object):
         self.max_date = None
         self.min = None
         self.min_date = None
-        self._date_created = datetime.datetime.now()
 
     def _extend_dataframe(self):
         self.data['year'] = self.data.index.year
@@ -199,12 +187,29 @@ def print_summary(stats):
 
 
 def rst_summary(stats):
+    # TODO: this is only a temporary hack until proper templates are made
     rst = []
+    rst.append("=======")
+    rst.append("SUMMARY")
+    rst.append("=======\n")
     rst.append("DATA COVERAGE")
     rst.append("=============\n\n::\n")
     rst.append(" {} days".format(stats.day_count))
     rst.append(" from {}".format(stats.start_date))
     rst.append(" to   {}".format(stats.end_date))
+    rst.append("\nEXTREMA")
+    rst.append("=======\n\n::\n")
+    rst.append(" min usage {:>8} kWh  ({})".format(stats.min, stats.min_date))
+    rst.append(" max usage {:>8} kWh  ({})".format(stats.max, stats.max_date))
+    rst.append("\nAVERAGES")
+    rst.append("========\n\n::\n")
+    for key in ['monthly', 'weekly', 'daily']:
+        rst.append("{:>10}{:>9.3f} kWh".format(key, stats.averages[key]))
+    rst.append("\n")
+    weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                'Saturday', 'Sunday']
+    for key in weekdays:
+        rst.append("{:>10}{:>9.3f} kWh".format(key, stats.averages[key]))
     return '\n'.join(rst)
 
 
@@ -229,12 +234,12 @@ def print_averages(stats):
     print "AVERAGES"
     print "========\n"
     for key in ['monthly', 'weekly', 'daily']:
-        print "{:>10}{:>9.3f} kWh".format(key, round(stats.averages[key], 3))
+        print "{:>10}{:>9.3f} kWh".format(key, stats.averages[key])
     print ""
     weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                 'Saturday', 'Sunday']
     for key in weekdays:
-        print "{:>10}{:>9.3f} kWh".format(key, round(stats.averages[key], 3))
+        print "{:>10}{:>9.3f} kWh".format(key, stats.averages[key])
     print ""
 
 
