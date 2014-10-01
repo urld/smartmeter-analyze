@@ -14,6 +14,19 @@ Installation
 
     $ pip install smartmeter-analyze
 
+Requirements
+============
+
+smartmeter-analyze uses the following libraries:
+
+* pandas
+* numpy
+
+In order to use the web interface additional libraries are needed:
+
+* flask
+* docutils 
+
 Usage
 =====
 
@@ -26,6 +39,14 @@ Print the summary, using multiple files or directories::
     $ smutil summary ~/some_dir_with_consumption_files/ another-file.csv
 
 You can download your energy consumption data from smartmetering.wienernetze.at
+
+To start the web interface, run::
+
+    $ smutil run_webutil
+
+The interface is accessible with this URL::
+
+    https://localhost:5000/analyze
 
 Features
 ========

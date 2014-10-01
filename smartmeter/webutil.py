@@ -15,6 +15,14 @@ log = logging.getLogger(__name__)
 TMP_STORAGE = None
 
 
+@app.route('/')
+def api_about():
+    """This only works in development environment."""
+    with open('README.rst') as file:
+        readme = file.read()
+    return publish_string(readme, writer_name='html')
+
+
 @app.route('/analyze', methods=['GET', 'POST'])
 def api_upload_csv():
     if request.method == 'POST':
