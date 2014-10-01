@@ -100,6 +100,22 @@ class FileDataSource(object):
         return self.cached_data
 
 
+def read_csv_file(file):
+    data = pd.read_csv(file,
+                       delimiter=';',
+                       header=0,  # ignore header
+                       usecols=[0, 1],  # third column is empty
+                       names=['date', 'usage'],
+                       index_col='date',  # use date as index
+                       decimal=',',
+                       parse_dates=True,
+                       infer_datetime_format=True,
+                       dayfirst=True,  # csv dateformat: DD.MM.YYYY
+                       )
+    log.info('read_data: IN={} OUT={}'.format(len(data), len(data)))
+    return data
+
+
 class Stats(object):
 
     def __init__(self, data):
@@ -113,6 +129,7 @@ class Stats(object):
         self.max_date = None
         self.min = None
         self.min_date = None
+        self._date_created = datetime.datetime.now()
 
     def _extend_dataframe(self):
         self.data['year'] = self.data.index.year
