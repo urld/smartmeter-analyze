@@ -1,11 +1,19 @@
 {% extends "base.html" %}
 {% block title %} - Analyze!{% endblock %}
 {% block content %}
+<div class="jumbotron">
+    <h1>Analyze your energy consumption!</h1>
+    <p class="lead">Upload your smartmeter data and get an usefull overview of your consumption statistics.</p>
+</div>
 <form action="" method=post enctype=multipart/form-data>
     <div class="form-group">
-        <label for="exampleInputFile">File input</label>
-        <input type="file" id="file" name="file">
-        <button type="submit" class="btn btn-default">Analyze!</button>
+        <label for="file">Upload your smartmeter data:</label>
+        <input class="btn btn-default" type="file" id="file" name="file">
+        <p class="help-block">
+        The application does not keep track of its users or their energy consumption statistics.</br>
+        Your data will only be stored for a short amount of time to let you look at the analysis result.
+        </p>
+        <button type="submit" class="btn btn-success btn-lg">Analyze!</button>
     </div>
 </form>
 {% endblock %}
