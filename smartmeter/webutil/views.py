@@ -1,9 +1,9 @@
 import logging
 
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, render_template
 from docutils.core import publish_string
 
-from smartmeter import analyze
+import smartmeter.analyze
 from smartmeter.webutil import app, TMP_STORAGE
 
 
@@ -19,37 +19,34 @@ def api_about():
 
 
 @app.route('/analyze', methods=['GET', 'POST'])
-def api_upload_csv():
+def analyze():
     if request.method == 'POST':
         file = request.files['file']
         if file and file.filename.rsplit('.', 1)[1] in ['csv']:
             key = TMP_STORAGE.add(file)
-            return redirect(url_for('api_analyze', key=key))
+            return redirect(url_for('report', key=key))
         else:
-            return redirect(url_for('api_upload_csv'))
+            return redirect(url_for('analyze'))
     else:
-        return '''
-        <!doctype html>
-        <title>Upload new File</title>
-        <h1>Upload new File</h1>
-        <form action="" method=post enctype=multipart/form-data>
-            <p><input type=file name=file></p>
-            <p><input type=submit value=Analyze!></p>
-        </form>
-        '''
+        return render_template('analyze.html')
 
 
 @app.route('/analyze/<key>')
-def api_analyze(key):
+def report(key):
     stats = TMP_STORAGE.get(key)
     if stats:
-        rst = analyze.rst_summary(stats)
+        rst = smartmeter.analyze.rst_summary(stats)
         return publish_string(rst, writer_name='html')
     else:
         return "404: Stats not found!", 404
 
 
 @app.route('/clear/<key>')
-def api_clear(key):
+def delete(key):
     TMP_STORAGE.remove(key)
-    return redirect(url_for('api_upload_csv'))
+    return redirect(url_for('analyze'))
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
