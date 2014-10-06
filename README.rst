@@ -78,3 +78,9 @@ The Icon was composed by the following pictograms:
 
 * Graph designed by Pham Thi Dieu Linh from the thenounproject.com
 * Socket designed by hunotika from the thenounproject.com
+
+Themes/Stylesheets
+------------------
+
+* Bootstrap from http://getbootstrap.com
+* Bootstrap Themes from http://bootswatch.com/
