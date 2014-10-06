@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="jumbotron">
+    <h1>Smartmeter Analyze</h1>
+    <p>The smart way to analyze your energy consumption, tracked by a 'Smartmeter'.</p>
+    <p><a href="{{ url_for('analyze') }}" class="btn btn-primary btn-lg" role="button">Let's do it!</a></p>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <h2>1. Get your data</h2>
+        <p>Download the csv file with consumption data tracked by your smartmeter from your network operator.</p>
+        <p class="text-info">Currently only csv files with daily data from 'Wiener Netze GmbH' are supported.</p>
+        <p><a class="btn btn-primary" href="http://smartmetering.wienernetze.at" target="_blank" role="button">Wiener Netze &raquo;</a></p>
+    </div>
+    <div class="col-lg-4">
+        <h2>2. Analyze</h2>
+        <p>Upload your data and let the app do the magic for you. Don't worry, your data will not be stored permanently. (If you still worry, have a look at the <a href="https://github.com/durl/smartmeter-analyze" target="_blank">&laquo; source code &raquo;</a>)</p>
+        <p><a class="btn btn-primary" href="{{ url_for('analyze') }}" role="button">Analyze &raquo;</a></p>
+    </div>
+    <div class="col-lg-4">
+        <h2>3. Inspect</h2>
+        <p>Inspect statistical consumption data, compare with previous months, or just look at consumption predictions coming straight from the future!</p>
+    </div>
+</div>
+
+{% endblock %}
+

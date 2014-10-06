@@ -10,12 +10,17 @@ from smartmeter.webutil import app, TMP_STORAGE
 log = logging.getLogger(__name__)
 
 
-@app.route('/')
-def api_about():
+@app.route('/about')
+def about():
     """This only works in development environment."""
     with open('README.rst') as file:
         readme = file.read()
     return publish_string(readme, writer_name='html')
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.route('/analyze', methods=['GET', 'POST'])
