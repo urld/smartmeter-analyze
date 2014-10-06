@@ -58,6 +58,7 @@ Features
 Screenshots
 ===========
 
+.. image:: doc/screenshots/webutil_index.png
 .. image:: doc/screenshots/webutil_upload.png
 
 TODO
