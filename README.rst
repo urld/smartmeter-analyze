@@ -55,6 +55,11 @@ Features
 * Basic consumption prediction
 * Handling of one or many (not necessarily disjunct) datasets
 
+Screenshots
+===========
+
+.. image:: doc/screenshots/webutil_upload.png
+
 TODO
 ====
 
