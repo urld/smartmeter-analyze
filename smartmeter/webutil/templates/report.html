@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron">
+    <h1>Smartmeter Analysis Report</h1>
+    <div class="row">
+        <div class="col-lg-3">
+            <table class="table table-hover">
+                <tr class="lead"><td>from</td><td>{{ stats.start_date }}</td></td></tr>
+                <tr class="lead"><td>to</td><td>{{ stats.end_date }}</td></tr>
+                <tr><td>{{ stats.day_count }} days</td><td></td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-3">
+        <div class="well">
+            <h2>Extrema</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Type</th><th>[kWh]</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>min</td><td>{{ stats.min|round(3) }}</td><td>{{ stats.min_date }}</td></tr>
+                    <tr><td>max</td><td>{{ stats.max|round(3) }}</td><td>{{ stats.max_date }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="well">
+            <h2>Averages</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Type</th><th>[kWh]</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>monthly</td><td>{{ stats.averages['monthly']|round(3) }}</td></tr>
+                    <tr><td>weekly</td><td>{{ stats.averages['weekly']|round(3) }}</td></tr>
+                    <tr><td>daily</td><td>{{ stats.averages['daily']|round(3) }}</td></tr>
+                </tbody>
+            </table>
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Weekday</th><th>[kWh]</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Monday</td><td>{{ stats.averages['Monday']|round(3) }}</td></tr>
+                    <tr><td>Tuesday</td><td>{{ stats.averages['Tuesday']|round(3) }}</td></tr>
+                    <tr><td>Wednesday</td><td>{{ stats.averages['Wednesday']|round(3) }}</td></tr>
+                    <tr><td>Thursday</td><td>{{ stats.averages['Thursday']|round(3) }}</td></tr>
+                    <tr><td>Friday</td><td>{{ stats.averages['Friday']|round(3) }}</td></tr>
+                    <tr><td>Saturday</td><td>{{ stats.averages['Saturday']|round(3) }}</td></tr>
+                    <tr><td>Sunday</td><td>{{ stats.averages['Sunday']|round(3) }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="well">
+            <h2>Comparisons</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Type</th><th>[kWh]</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>last month total</td><td>{{ stats.comparisons.prev_total_usage|round(3) }}</td><td>{{ stats.comparisons.prev_end_date }}</td></tr>
+                    <tr><td>last month</td><td>{{ stats.comparisons.prev_cum_usage|round(3) }}</td><td>{{ stats.comparisons.prev_due_date }}</td></tr>
+                    <tr><td>current month</td><td>{{ stats.comparisons.cum_usage|round(3) }}</td><td>{{ stats.comparisons.due_date }}</td></tr>
+                    <tr><td>delta</td><td>{{ '{:+.3f}'.format(stats.comparisons.delta) }}</td><td>{{ stats.comparisons.prev_due_date }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="well">
+            <h2>Predictions</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Type</th><th>[kWh]</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>expected</td><td>{{ stats.comparisons.predicted_usage|round(3) }}</td><td></td></tr>
+                    <tr><td>delta (monthly)</td><td>{{ '{:+.3f}'.format(stats.comparisons.predicted_delta) }}</td><td>{{ stats.comparisons.prev_end_date }}</td></tr>
+                    <tr><td>delta (avg)</td><td>{{ '{:+.3f}'.format(stats.comparisons.predicted_avg_delta) }}</td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<form action="" method="post">
+    <div class="form-group">
+        <label form="file">Delete your report</label>
+        <p><button type="submit" class="btn btn-default">Delete</button><p>
+        <p class="help-block">All your data well be erased instantly.</p>
+    </div>
+</form>
+{% endblock %}

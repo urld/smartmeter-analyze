@@ -164,10 +164,36 @@ class Stats(object):
             self.max = self.data.usage.max()
         return self.min, self.max
 
+    def calc_comparisons(self, due_date=None):
+        if not due_date:
+            due_date = self.end_date
+        self.comparisons = {}
+        self.comparisons['due_date'] = due_date
+        cum_usage = self.get_monthly_cumsum(due_date)
+        self.comparisons['cum_usage'] = cum_usage
+        prev_due_date = _previous_month(due_date)
+        self.comparisons['prev_due_date'] = prev_due_date
+        prev_cum_usage = self.get_monthly_cumsum(prev_due_date)
+        self.comparisons['prev_cum_usage'] = prev_cum_usage
+        prev_end_date = _previous_month_end(due_date)
+        self.comparisons['prev_end_date'] = prev_end_date
+        prev_total_usage = self.get_monthly_cumsum(prev_end_date)
+        self.comparisons['prev_total_usage'] = prev_total_usage
+        delta = cum_usage - prev_cum_usage
+        self.comparisons['delta'] = delta
+
+        predicted_usage = (cum_usage/due_date.day) * 30.5
+        self.comparisons['predicted_usage'] = predicted_usage
+        predicted_delta = predicted_usage - prev_total_usage
+        self.comparisons['predicted_delta'] = predicted_delta
+        predicted_avg_delta = predicted_usage - self.averages['monthly']
+        self.comparisons['predicted_avg_delta'] = predicted_avg_delta
+
     def calc_stats(self):
         self.calc_date_range()
         self.calc_extrema()
         self.calc_averages()
+        self.calc_comparisons()
 
     def get_monthly_cumsum(self, due_date=None):
         if not due_date:
@@ -178,6 +204,7 @@ class Stats(object):
         if not due_date:
             due_date = self.end_date
         return self.data.loc[due_date, 'yearly_cumsum']
+
 
 
 def print_summary(stats):

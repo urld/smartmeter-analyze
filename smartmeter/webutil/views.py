@@ -36,22 +36,32 @@ def analyze():
         return render_template('analyze.html')
 
 
-@app.route('/analyze/<key>')
+@app.route('/analyze/<key>', methods=['GET'])
 def report(key):
-    stats = TMP_STORAGE.get(key)
-    if stats:
-        rst = smartmeter.analyze.rst_summary(stats)
-        return publish_string(rst, writer_name='html')
-    else:
-        return "404: Stats not found!", 404
+    try:
+        stats = TMP_STORAGE.get(key)
+    except KeyError as e:
+        return resource_not_found(e)
+    return render_template('report.html', stats=stats)
+#    rst = smartmeter.analyze.rst_summary(stats)
+#    return publish_string(rst, writer_name='html')
 
 
-@app.route('/clear/<key>')
+@app.route('/analyze/<key>', methods=['DELETE', 'POST'])
 def delete(key):
-    TMP_STORAGE.remove(key)
-    return redirect(url_for('analyze'))
+    try:
+        TMP_STORAGE.remove(key)
+    except KeyError as e:
+        return resource_not_found(e)
+    return redirect(url_for('index'))
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template('404.site.html', page=request.path), 404
+
+
+def resource_not_found(e):
+    return render_template('404.resource.html',
+                           method=request.method,
+                           resource=request.path), 404

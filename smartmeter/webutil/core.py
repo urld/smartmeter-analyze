@@ -33,6 +33,7 @@ class TmpStorage(object):
 
     def remove(self, key):
         del self.storage[key]
+        log.info('Deleted: {}'.format(key))
 
     def cleanup(self, minutes=15):
         now = datetime.datetime.now()

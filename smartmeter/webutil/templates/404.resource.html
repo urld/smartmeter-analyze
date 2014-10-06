@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %} - Resource Not Found{% endblock %}
+{% block content %}
+<h1>Resource Not Found</h1>
+<p>Unable to process your request ({{ method }}).</br>
+The resource <code>{{ resource }}</code> could not be located.</p>
+<p><a href="{{ url_for('analyze') }}">Would you like to analyze your data?</a></p>
+{% endblock %}
