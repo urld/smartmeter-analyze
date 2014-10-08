@@ -90,12 +90,18 @@
         </div>
     </div>
 </div>
-
-<form action="" method="post">
-    <div class="form-group">
-        <label class="label-default" form="file">Delete your report</label>
-        <p><button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button><p>
-        <p class="help-block">All your data will be erased instantly.</p>
-    </div>
-</form>
+<div class="row">
+<div class="col-lg-3 pull-right">
+<div class="">
+    <p>This report will be available for about {{ ttl_minutes }} minutes, and was created at {{ load_dts.strftime('%H:%M:%S') }}.</p>
+    <form action="" method="post">
+        <div class="form-group">
+            <label class="label-default sr-only" form="file">Delete your report now:</label>
+            <p><button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button><p>
+            <p class="help-block">All your data will be erased instantly.</p>
+        </div>
+    </form>
+</div>
+</div>
+</div>
 {% endblock %}

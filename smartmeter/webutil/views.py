@@ -1,9 +1,7 @@
 import logging
 
 from flask import request, redirect, url_for, render_template
-from docutils.core import publish_string
 
-import smartmeter.analyze
 from smartmeter.webutil import app, TMP_STORAGE
 
 
@@ -15,7 +13,7 @@ def about():
     """This only works in development environment."""
     with open('README.rst') as file:
         readme = file.read()
-    return publish_string(readme, writer_name='html')
+    return readme
 
 
 @app.route('/')
@@ -40,11 +38,13 @@ def analyze():
 def report(key):
     try:
         stats = TMP_STORAGE.get(key)
+        load_dts = TMP_STORAGE.get_load_dts(key)
+        ttl_minutes = int(TMP_STORAGE.get_ttl().total_seconds() / 60)
     except KeyError as e:
         return resource_not_found(e)
-    return render_template('report.html', stats=stats)
-#    rst = smartmeter.analyze.rst_summary(stats)
-#    return publish_string(rst, writer_name='html')
+    return render_template('report.html', stats=stats,
+                           load_dts=load_dts,
+                           ttl_minutes=ttl_minutes)
 
 
 @app.route('/analyze/<key>', methods=['DELETE', 'POST'])

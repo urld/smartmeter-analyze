@@ -2,7 +2,7 @@ from flask import Flask
 from smartmeter.webutil.core import TmpStorage
 
 # Initialize a temporary storage for uploaded data:
-TMP_STORAGE = TmpStorage()
+TMP_STORAGE = TmpStorage(ttl_minutes=5)
 
 # Initialize the web application:
 app = Flask(__name__)
