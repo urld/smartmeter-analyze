@@ -18,7 +18,8 @@ setup(
         'smartmeter',
         'smartmeter.webutil',
     ],
-    package_data={'smartmeter': ['logging.conf']},
+    package_data={'smartmeter': ['logging.conf'],
+                  'smartmeter.webutil': ['templates/*', 'static/*']},
     py_modules=[
         'docopt',
     ],
