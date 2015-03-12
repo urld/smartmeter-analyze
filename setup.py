@@ -16,8 +16,8 @@ setup(
     url='https://github.com/durl/smartmeter-analyze',
     packages=[
         'smartmeter',
+        'smartmeter.webutil',
     ],
-    package_dir={'smartmeter': 'smartmeter'},
     package_data={'smartmeter': ['logging.conf']},
     py_modules=[
         'docopt',
@@ -31,15 +31,12 @@ setup(
     license='GNU Affero General Public License v3 or later (AGPLv3+)',
     keywords='smartmeter, data analysis, wiener netze',
     classifiers=[
-        # 'Development Status :: 1 - Planning',
         'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Natural Language :: English',
-        'Operating System :: OS Independent',   # is it?
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Topic :: Scientific/Engineering :: Information Analysis',
         'Topic :: Utilities',
