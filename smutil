@@ -26,13 +26,14 @@ import logging
 
 from docopt import docopt
 from smartmeter import analyze, __version__
-from smartmeter.webutil import app
 
 log = logging.getLogger(__name__)
 
 
 def run_server(debug=False):
-    app.run(debug=debug, host='0.0.0.0', ssl_context='adhoc')
+    from smartmeter.webutil import app
+    # app.run(debug=debug, host='0.0.0.0', ssl_context='adhoc')
+    app.run(debug=debug, host='0.0.0.0')
 
 
 if __name__ == "__main__":
