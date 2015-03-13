@@ -2,7 +2,7 @@ import logging
 
 from flask import request, redirect, url_for, render_template
 
-from smartmeter.webutil import app, TMP_STORAGE
+from webutil import app, TMP_STORAGE
 
 
 log = logging.getLogger(__name__)

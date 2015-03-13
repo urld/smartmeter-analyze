@@ -16,11 +16,11 @@ setup(
     url='https://github.com/durl/smartmeter-analyze',
     packages=[
         'smartmeter',
-        'smartmeter.webutil',
+        'webutil',
     ],
     package_data={'smartmeter': ['logging.conf'],
-                  'smartmeter.webutil': ['templates/*/*', 'templates/*',
-                                         'static/*/*', 'static/*']},
+                  'webutil': ['templates/*/*', 'templates/*',
+                              'static/*/*', 'static/*']},
     py_modules=[
         'docopt',
     ],
