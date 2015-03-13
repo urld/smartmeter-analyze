@@ -19,7 +19,8 @@ setup(
         'smartmeter.webutil',
     ],
     package_data={'smartmeter': ['logging.conf'],
-                  'smartmeter.webutil': ['templates/*', 'static/*']},
+                  'smartmeter.webutil': ['templates/*/*', 'templates/*',
+                                         'static/*/*', 'static/*']},
     py_modules=[
         'docopt',
     ],
@@ -36,7 +37,6 @@ setup(
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Natural Language :: English',
         'Programming Language :: Python :: 2.7',
         'Topic :: Scientific/Engineering :: Information Analysis',
