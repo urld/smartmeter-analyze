@@ -74,17 +74,7 @@ class FileDataSource(object):
         log.debug('Reading files: ' + repr(self.sources))
         data = []
         for filename in self.sources:
-            data += [pd.read_csv(filename,
-                                 delimiter=';',
-                                 header=0,  # ignore header
-                                 usecols=[0, 1],  # third column is empty
-                                 names=['date', 'usage'],
-                                 index_col='date',  # use date as index
-                                 decimal=',',
-                                 parse_dates=True,
-                                 infer_datetime_format=True,
-                                 dayfirst=True,  # csv dateformat: DD.MM.YYYY
-                                 )]
+            data += [read_csv_file(filename)]
         if data:
             union = pd.concat(data)
             union.sort_index(inplace=True)
@@ -98,6 +88,21 @@ class FileDataSource(object):
         if self.cached_data is None:
             self.cached_data = self._read_data()
         return self.cached_data
+
+
+def read_csv_file(file):
+    data = pd.read_csv(file,
+                       delimiter=';',
+                       header=0,  # ignore header
+                       usecols=[0, 1],  # third column is empty
+                       names=['date', 'usage'],
+                       index_col='date',  # use date as index
+                       decimal=',',
+                       parse_dates=True,
+                       infer_datetime_format=True,
+                       dayfirst=True,  # csv dateformat: DD.MM.YYYY
+                       )
+    return data
 
 
 class Stats(object):
@@ -159,10 +164,36 @@ class Stats(object):
             self.max = self.data.usage.max()
         return self.min, self.max
 
+    def calc_comparisons(self, due_date=None):
+        if not due_date:
+            due_date = self.end_date
+        self.comparisons = {}
+        self.comparisons['due_date'] = due_date
+        cum_usage = self.get_monthly_cumsum(due_date)
+        self.comparisons['cum_usage'] = cum_usage
+        prev_due_date = _previous_month(due_date)
+        self.comparisons['prev_due_date'] = prev_due_date
+        prev_cum_usage = self.get_monthly_cumsum(prev_due_date)
+        self.comparisons['prev_cum_usage'] = prev_cum_usage
+        prev_end_date = _previous_month_end(due_date)
+        self.comparisons['prev_end_date'] = prev_end_date
+        prev_total_usage = self.get_monthly_cumsum(prev_end_date)
+        self.comparisons['prev_total_usage'] = prev_total_usage
+        delta = cum_usage - prev_cum_usage
+        self.comparisons['delta'] = delta
+
+        predicted_usage = (cum_usage/due_date.day) * 30.5
+        self.comparisons['predicted_usage'] = predicted_usage
+        predicted_delta = predicted_usage - prev_total_usage
+        self.comparisons['predicted_delta'] = predicted_delta
+        predicted_avg_delta = predicted_usage - self.averages['monthly']
+        self.comparisons['predicted_avg_delta'] = predicted_avg_delta
+
     def calc_stats(self):
         self.calc_date_range()
         self.calc_extrema()
         self.calc_averages()
+        self.calc_comparisons()
 
     def get_monthly_cumsum(self, due_date=None):
         if not due_date:
@@ -175,10 +206,38 @@ class Stats(object):
         return self.data.loc[due_date, 'yearly_cumsum']
 
 
+
 def print_summary(stats):
     print_coverage(stats)
     print_extrema(stats)
     print_averages(stats)
+
+
+def rst_summary(stats):
+    # TODO: this is only a temporary hack until proper templates are made
+    rst = []
+    rst.append("=======")
+    rst.append("SUMMARY")
+    rst.append("=======\n")
+    rst.append("DATA COVERAGE")
+    rst.append("=============\n\n::\n")
+    rst.append(" {} days".format(stats.day_count))
+    rst.append(" from {}".format(stats.start_date))
+    rst.append(" to   {}".format(stats.end_date))
+    rst.append("\nEXTREMA")
+    rst.append("=======\n\n::\n")
+    rst.append(" min usage {:>8} kWh  ({})".format(stats.min, stats.min_date))
+    rst.append(" max usage {:>8} kWh  ({})".format(stats.max, stats.max_date))
+    rst.append("\nAVERAGES")
+    rst.append("========\n\n::\n")
+    for key in ['monthly', 'weekly', 'daily']:
+        rst.append("{:>10}{:>9.3f} kWh".format(key, stats.averages[key]))
+    rst.append("\n")
+    weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                'Saturday', 'Sunday']
+    for key in weekdays:
+        rst.append("{:>10}{:>9.3f} kWh".format(key, stats.averages[key]))
+    return '\n'.join(rst)
 
 
 def print_coverage(stats):
@@ -202,12 +261,12 @@ def print_averages(stats):
     print "AVERAGES"
     print "========\n"
     for key in ['monthly', 'weekly', 'daily']:
-        print "{:>10}{:>9.3f} kWh".format(key, round(stats.averages[key], 3))
+        print "{:>10}{:>9.3f} kWh".format(key, stats.averages[key])
     print ""
     weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                 'Saturday', 'Sunday']
     for key in weekdays:
-        print "{:>10}{:>9.3f} kWh".format(key, round(stats.averages[key], 3))
+        print "{:>10}{:>9.3f} kWh".format(key, stats.averages[key])
     print ""
 
 
