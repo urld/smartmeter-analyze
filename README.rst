@@ -7,12 +7,26 @@ This Tool was written to analyze your personal energy consumption.
 The Tool currently only supports CSV files with daily consumption values, as
 provided by the 'Smart Metering' service of 'Wiener Netze GmbH'.
 
+
+Features
+========
+
+* Generation of basic consumption summaries (averages, peaks, etc.)
+* Basic consumption prediction
+* Handling of one or many (not necessarily disjunct) datasets
+
 Installation
 ============
 
 ::
 
     $ pip install smartmeter-analyze
+
+You can also run the application as a Docker container::
+
+    $ make run
+
+This will build and run a container with the web interface of the application. In this case you can access the application over port 80 of the containers host.
 
 Requirements
 ============
@@ -44,16 +58,18 @@ To start the web interface, run::
 
     $ smutil run_webutil
 
+or for the container version::
+
+    $ make run
+
 The interface is accessible with this URL::
 
-    https://localhost:5000/analyze
+    http://localhost:5000/analyze
 
-Features
-========
-
-* Generation of basic consumption summaries (averages, peaks, etc.)
-* Basic consumption prediction
-* Handling of one or many (not necessarily disjunct) datasets
+If you run the application in the Docker container you can use port 80 on the containers host.
+To stop and remove the container use::
+    
+    $ make clean
 
 Screenshots
 ===========
