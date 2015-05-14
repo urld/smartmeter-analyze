@@ -123,7 +123,7 @@ class Stats(object):
         self.data['year'] = self.data.index.year
         self.data['month'] = self.data.index.month
         self.data['weekday'] = self.data.index.weekday
-        monthly = self.data.groupby('month')
+        monthly = self.data.groupby(['month', 'year'])
         self.data['monthly_cumsum'] = monthly['usage'].cumsum()
         yearly = self.data.groupby('year')
         self.data['yearly_cumsum'] = yearly['usage'].cumsum()
