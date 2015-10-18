@@ -30,16 +30,16 @@ stop:
 			echo "stopping docker container..."; \
 			cat .container | xargs docker stop; \
 		fi;
-
-
-.PHONY: clean
-clean: stop
 		@if [[ -f .container ]]; \
 		then \
 			echo "deleting docker container..."; \
 			cat .container | xargs docker rm; \
 			rm -f .container; \
 		fi;
+
+
+.PHONY: clean
+clean:
 		rm -rf dist/
 
 

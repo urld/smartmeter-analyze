@@ -143,7 +143,7 @@ class Stats(object):
         if 'daily' not in self.averages:
             self.averages['daily'] = self.data.usage.mean()
         if 'monthly' not in self.averages:
-            monthly = self.data.groupby('month')
+            monthly = self.data.groupby(['month', 'year'])
             monthly_avg = monthly[['usage']].sum()[:-1].usage.mean()
             self.averages['monthly'] = monthly_avg
         if 'weekly' not in self.averages:
@@ -204,7 +204,6 @@ class Stats(object):
         if not due_date:
             due_date = self.end_date
         return self.data.loc[due_date, 'yearly_cumsum']
-
 
 
 def print_summary(stats):
